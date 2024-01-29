@@ -33,7 +33,10 @@ class MainPage(BasePage):
             "GLUXHiddenSuccessSelectedAddressPlaceholder",
         )
         self.success_message_text = (By.ID, "GLUXHiddenSuccessSubTextAisEgress")
-        self.error_message = (By.CSS_SELECTOR, "a-alert-inline-error div")
+        self.error_message = (
+            By.CSS_SELECTOR,
+            "span[id='GLUXZipError'] div[class='a-box-inner a-alert-container'] div",
+        )
         self.continue_btn = (By.XPATH, "(//input[@id='GLUXConfirmClose'])[2]")
         self.deliver_location = (By.ID, "glow-ingress-line2")
 
@@ -53,22 +56,19 @@ class MainPage(BasePage):
     def get_message_text(self):
         return self.driver.find_element(*self.message).text
 
-    # 15
     def get_search_section_title_text(self):
         search_section_title_result = (
             WebDriverWait(self.driver, 10)
             .until(EC.visibility_of_element_located(self.search_section_title_result))
-            .text
+            .get_attribute("textContent")
         )
         return search_section_title_result.strip('""')
 
-    # 30
     def click_deliver_to_btn(self):
         WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable(self.deliver_btn)
         ).click()
 
-    # 30
     def enter_zip_code_and_confirm(self, zip):
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located(self.modal)
@@ -90,9 +90,10 @@ class MainPage(BasePage):
         )
 
     def get_error_message_text(self):
-        return self.driver.find_element(*self.error_message).text
+        return self.driver.find_element(*self.error_message).get_attribute(
+            "textContent"
+        )
 
-    # 30
     def confirm_location(self):
         WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable(self.continue_btn)
@@ -104,6 +105,3 @@ class MainPage(BasePage):
             "textContent"
         )
         return result.rstrip().split()[-1][0:5]
-
-
-# pytest -s -m ui
